@@ -14,17 +14,5 @@ echo "Docker instalado y en funcionamiento."
 # Añadir ec2-user al grupo docker para usar Docker sin sudo
 sudo usermod -aG docker ec2-user
 
-# Instalando Apache (httpd)
-echo "Instalando Apache (httpd)..."
-sudo yum install -y httpd
-
-# Habilitar e iniciar Apache
-sudo systemctl enable --now httpd
-echo "Apache (httpd) instalado y en funcionamiento."
-
 # Verificación de los servicios
-echo "Verificando el estado de Docker..."
 sudo systemctl status docker --no-pager
-
-echo "Verificando el estado de Apache..."
-sudo systemctl status httpd --no-pager
