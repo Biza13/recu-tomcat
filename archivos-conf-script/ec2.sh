@@ -22,3 +22,5 @@ sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-c
 
 # Establecer permisos de ejecución para docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
+
+sleep 30
