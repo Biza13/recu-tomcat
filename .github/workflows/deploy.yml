@@ -86,7 +86,7 @@ jobs:
             command -v docker || echo "Docker no está en el PATH"
 
             echo "==> Ejecutando docker compose"
-            docker compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d
+            docker-compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d
           EOF
 
       - name: Borrar archivo private key
