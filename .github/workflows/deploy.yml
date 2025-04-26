@@ -77,10 +77,17 @@ jobs:
       #  run: |
       #    ssh -i deploy_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.despliegue.outputs.instance_public_ip }} "/usr/local/bin/docker-compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d"
 
-      - name: Ejecutar Docker Compose
+      - name: Ejecutar Docker Compose en remoto
         run: |
-          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.despliegue.outputs.instance_public_ip }} "
-          /usr/bin/docker compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d"
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.despliegue.outputs.instance_public_ip }} <<'EOF'
+            set -e
+            echo "==> PATH actual: $PATH"
+            echo "==> Dónde está Docker:"
+            command -v docker || echo "Docker no está en el PATH"
+
+            echo "==> Ejecutando docker compose"
+            docker compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d
+          EOF
 
       - name: Borrar archivo private key
         run: |
