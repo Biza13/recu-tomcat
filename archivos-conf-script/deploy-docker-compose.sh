@@ -9,67 +9,51 @@ echo "Instalando Docker..."
 sudo amazon-linux-extras install docker -y
 sudo systemctl enable --now docker
 
-# Configurar el usuario docker sin sudo
+# Configurar usuario docker sin sudo
 sudo usermod -aG docker ec2-user
 
+# Instalar dependencias necesarias
+echo "Instalando dependencias necesarias..."
+sudo yum install -y git awscli curl
+
 # Verificar si Docker está instalado
-echo "Verificando Docker..."
-if ! which docker > /dev/null 2>&1; then
-  echo "Docker no está instalado. Procediendo con instalación..."
-  sudo yum install docker -y
-else
-  echo "Docker ya está instalado."
+if ! command -v docker &> /dev/null
+then
+    echo "Docker no está instalado. Instalación fallida."
+    exit 1
 fi
 
-# Verificar si Docker Compose está instalado
-echo "Verificando Docker Compose..."
-if ! which docker-compose > /dev/null 2>&1; then
-  echo "Docker Compose no está instalado, procediendo con instalación..."
-  
-  # Instalar Docker Compose v2 (última versión estable)
-  DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-  mkdir -p $DOCKER_CONFIG/cli-plugins
-  curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
+# Instalar Docker Compose v2 (última versión estable)
+echo "Instalando Docker Compose v2..."
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+
+# Descargar Docker Compose v2
+curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
     -o $DOCKER_CONFIG/cli-plugins/docker-compose
-  chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-  
-  # Crear enlace simbólico para acceso global
-  sudo ln -s $DOCKER_CONFIG/cli-plugins/docker-compose /usr/local/bin/docker-compose
-else
-  echo "Docker Compose ya está instalado."
+
+# Dar permisos de ejecución al archivo descargado
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+# Verificar si Docker Compose v2 está instalado
+if ! command -v docker compose &> /dev/null
+then
+    echo "Docker Compose no está instalado correctamente. Instalación fallida."
+    exit 1
 fi
 
-# Verificar si Docker y Docker Compose están disponibles
-echo "=== Versiones instaladas ==="
+# Verificar la versión de Docker y Docker Compose
+echo "Docker version:"
 docker --version
+echo "Docker Compose version:"
 docker compose version
 
-# Instalar dependencias útiles
-echo "Instalando dependencias adicionales..."
-sudo yum install -y git awscli
+# Ejecutar docker compose up
+echo "Ejecutando 'docker compose up'..."
+cd archivos-conf-script
+docker compose up -d
 
-# Configurar Docker para usar overlay2
-echo "Configurando Docker para usar el almacenamiento overlay2..."
-sudo mkdir -p /etc/docker
-sudo tee /etc/docker/daemon.json <<EOF
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
+# Verificar si los contenedores están corriendo
+docker ps
 
-# Reiniciar Docker para aplicar los cambios
-sudo systemctl restart docker
-
-# Verificar la instalación de Docker y Docker Compose
-echo "Verificando instalaciones..."
-docker --version
-docker compose version
-aws --version
-
-echo "Instalación completada."
-
+echo "El proceso ha terminado con éxito. Los contenedores deberían estar en ejecución."
