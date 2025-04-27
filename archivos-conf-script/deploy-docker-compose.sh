@@ -3,15 +3,19 @@
 # Salir si algo falla
 set -e
 
-# Verificar Docker
-echo "Docker version:"
-docker -v
+# Mostrar el PATH para depurar
+echo "PATH: $PATH"
 
-echo "Docker Compose version:"
-docker compose version
+# Verificar si Docker está disponible
+which docker
+docker --version
+
+# Verificar si Docker Compose está disponible
+which docker-compose
+docker-compose --version
 
 # Ir al directorio del proyecto
 cd /home/ec2-user/archivos-conf-script
 
 # Ejecutar docker compose
-docker compose up -d
+docker-compose up -d
