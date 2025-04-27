@@ -77,10 +77,10 @@ jobs:
         run: |
           scp -i deploy_key.pem -r -o StrictHostKeyChecking=no certificado ec2-user@${{ needs.despliegue.outputs.instance_public_ip }}:/home/ec2-user/certificado
 
-      - name: Ejecutar Docker Compose en remoto
+      - name: Ejecutar Docker Compose con sudo (ruta absoluta)
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.despliegue.outputs.instance_public_ip }} 'bash -l -c "
-            sudo docker compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d
+            sudo $(which docker) compose -f /home/ec2-user/archivos-conf-script/docker-compose.yml up -d
           "'
 
       - name: Borrar archivo private key
