@@ -70,9 +70,11 @@ jobs:
           chmod 600 deploy_key.pem
 
       - name: Esperar a que la instancia esté lista
+        env:
+          AWS_REGION: us-east-1  # Asegúrate de que coincida con tu región
         run: |
           aws ec2 wait instance-status-ok \
-            --instance-ids ${{ steps.terraform.outputs.instance_id }}    
+            --instance-ids ${{ steps.terraform.outputs.instance_id }}   
 
       - name: Subir carpeta con docker-compose y archivos necesarios
         run: |
