@@ -66,7 +66,7 @@ resource "aws_instance" "instancia_fedora" {
     Name = "instancia-amazon-linux"
   }
 
-  user_data = file("../archivos-conf-script/ec2.sh")
+  user_data = file("../archivos-conf-script/ec2-1.sh")
 
   #Provisionador para copiar solo archivos !!!!solo funciona en local
   #provisioner "file" {
