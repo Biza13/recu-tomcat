@@ -80,7 +80,8 @@ jobs:
       - name: Ejecutar Docker Compose
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.despliegue.outputs.instance_public_ip }} \
-            "sudo /bin/docker compose -f ~/archivos-conf-script/docker-compose.yml up -d"
+            "sudo docker compose -f ~/archivos-conf-script/docker-compose.yml up -d"
+
 
       - name: Borrar archivo private key
         run: |
