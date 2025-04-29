@@ -1,11 +1,14 @@
 services:
   apache:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: apache-web
+    #el build: .  seria para hacerlo desde un dockerfile
+    #build: .
+    #y asi simplemente coges una imagen ya hecha de dockerhub
+    image: httpd:2.4
+    container_name: apache
     ports:
       - "80:80"
+    volumes:
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf  
     networks:
       - app-network
     depends_on:
