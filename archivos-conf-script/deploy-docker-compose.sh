@@ -51,7 +51,7 @@ docker compose version
 # Ejecutar docker compose up
 echo "Ejecutando 'docker compose up'..."
 cd archivos-conf-script
-docker compose up -d
+docker-compose up -d
 
 # Verificar si los contenedores están corriendo
 docker ps
