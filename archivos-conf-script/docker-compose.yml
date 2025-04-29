@@ -9,6 +9,7 @@ services:
       - "80:80"
     volumes:
       - ./httpd.conf:/usr/local/apache2/conf/httpd.conf  
+      - ./httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
     networks:
       - app-network
     depends_on:
@@ -18,8 +19,8 @@ services:
   tomcat:
     image: tomcat:9.0
     container_name: tomcat
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     volumes:
       - ./webapps/:/usr/local/tomcat/webapps/
     networks:
