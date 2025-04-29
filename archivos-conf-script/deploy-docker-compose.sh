@@ -28,8 +28,7 @@ docker compose version
 
 # Ejecutar docker compose
 echo "Ejecutando docker compose up..."
-cd /home/ec2-user/archivos-conf-script
-docker-compose up -d
+docker-compose -f ./archivos-conf-script/docker-compose.yml up -d
 
 echo "Proceso completado. Contenedores en ejecución:"
 docker ps
