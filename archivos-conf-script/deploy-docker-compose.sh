@@ -1,59 +1,79 @@
 #!/bin/bash
 
+# Función para imprimir mensajes con color
+function log_message {
+    echo -e "\033[1;34m$1\033[0m"
+}
+
+# Función para manejar errores
+function handle_error {
+    log_message "ERROR: $1"
+    exit 1
+}
+
 # Actualizar el sistema
-echo "Actualizando el sistema..."
-sudo yum update -y
+log_message "Actualizando el sistema..."
+sudo yum update -y || handle_error "Falló la actualización del sistema"
 
 # Instalar Docker
-echo "Instalando Docker..."
-sudo amazon-linux-extras install docker -y
-sudo systemctl enable --now docker
+log_message "Instalando Docker..."
+sudo amazon-linux-extras install docker -y || handle_error "Falló la instalación de Docker"
+sudo systemctl enable --now docker || handle_error "Falló al iniciar Docker"
 
 # Configurar usuario docker sin sudo
-sudo usermod -aG docker ec2-user
+sudo usermod -aG docker ec2-user || handle_error "Falló al configurar grupos de usuario"
 
 # Instalar dependencias necesarias
-echo "Instalando dependencias necesarias..."
-sudo yum install -y git awscli curl
+log_message "Instalando dependencias necesarias..."
+sudo yum install -y git awscli curl || handle_error "Falló la instalación de dependencias"
 
-# Verificar si Docker está instalado
-if ! command -v docker &> /dev/null
-then
-    echo "Docker no está instalado. Instalación fallida."
-    exit 1
+# Verificar Docker
+if ! command -v docker &>/dev/null; then
+    handle_error "Docker no está instalado correctamente"
 fi
 
-# Instalar Docker Compose v2 (última versión estable)
-echo "Instalando Docker Compose v2..."
+# Instalar Docker Compose v2
+log_message "Instalando Docker Compose v2..."
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-mkdir -p $DOCKER_CONFIG/cli-plugins
+mkdir -p $DOCKER_CONFIG/cli-plugins || handle_error "Falló al crear directorio"
 
-# Descargar Docker Compose v2
-curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
-    -o $DOCKER_CONFIG/cli-plugins/docker-compose
-
-# Dar permisos de ejecución al archivo descargado
-chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-
-# Verificar si Docker Compose v2 está instalado
-if ! command -v docker compose &> /dev/null
-then
-    echo "Docker Compose no está instalado correctamente. Instalación fallida."
-    exit 1
+# Descargar Docker Compose
+COMPOSE_URL="https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)"
+if ! curl -SL "$COMPOSE_URL" -o $DOCKER_CONFIG/cli-plugins/docker-compose; then
+    handle_error "Falló al descargar Docker Compose"
 fi
 
-# Verificar la versión de Docker y Docker Compose
-echo "Docker version:"
-docker --version
-echo "Docker Compose version:"
-docker compose version
+# Permisos de ejecución
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose || handle_error "Falló al dar permisos"
 
-# Ejecutar docker compose up
-echo "Ejecutando 'docker compose up'..."
-cd archivos-conf-script
-docker-compose up -d
+# Verificar Docker Compose
+if ! docker compose version &>/dev/null; then
+    handle_error "Docker Compose no funciona correctamente"
+fi
 
-# Verificar si los contenedores están corriendo
-docker ps
+# Mostrar versiones
+log_message "Versiones instaladas:"
+docker --version || handle_error "No se puede obtener versión de Docker"
+docker compose version || handle_error "No se puede obtener versión de Docker Compose"
 
-echo "El proceso ha terminado con éxito. Los contenedores deberían estar en ejecución."
+# Configurar entorno para el usuario actual (evita necesidad de logout)
+newgrp docker <<EONG
+# Ejecutar los contenedores
+log_message "Iniciando contenedores..."
+cd ~/archivos-conf-script || handle_error "No se encontró el directorio del proyecto"
+
+# Asegurar que httpd.conf tiene la configuración correcta
+if ! grep -q "LoadModule mpm_event_module" httpd.conf; then
+    sed -i '1iLoadModule mpm_event_module modules/mod_mpm_event.so' httpd.conf
+fi
+
+docker compose up -d || handle_error "Falló al iniciar los contenedores"
+
+# Verificar contenedores
+log_message "Estado de los contenedores:"
+docker ps || handle_error "Falló al verificar contenedores"
+
+log_message "Proceso completado exitosamente. Accede a:"
+log_message " - http://bego.work.gd"
+log_message " - http://bego1.work.gd"
+EONG

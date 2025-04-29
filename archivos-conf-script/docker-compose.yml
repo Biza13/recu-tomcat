@@ -12,6 +12,7 @@ services:
       - app-network
     depends_on:
       - tomcat
+    restart: unless-stopped  
 
   tomcat:
     image: tomcat:9.0
