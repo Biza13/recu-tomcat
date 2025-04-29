@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   apache:
-    image: Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: apache-web
     ports:
       - "80:80"
@@ -14,7 +14,7 @@ services:
 
   tomcat:
     image: tomcat:9.0
-    container_name: tomcat-server
+    container_name: tomcat
     expose:
       - "8080"
     volumes:
