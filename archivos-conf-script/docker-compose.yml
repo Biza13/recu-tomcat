@@ -2,12 +2,10 @@ version: '3.8'
 
 services:
   apache:
-    image: httpd:2.4
+    image: Dockerfile
     container_name: apache-web
     ports:
       - "80:80"
-    volumes:
-      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
     networks:
       - app-network
     depends_on:

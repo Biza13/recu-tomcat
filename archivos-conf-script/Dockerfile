@@ -1,10 +1,8 @@
-FROM tomcat:9.0-jdk17
+FROM httpd:2.4
 
-# Limpia apps por defecto
-RUN rm -rf /usr/local/tomcat/webapps/*
+RUN apt-get update && \
+    apt-get install -y apache2-bin && \
+    sed -i '/mod_proxy.so/s/^#//g' /usr/local/apache2/conf/httpd.conf && \
+    sed -i '/mod_proxy_http.so/s/^#//g' /usr/local/apache2/conf/httpd.conf
 
-# Copia el .war compilado al Tomcat
-COPY ./proyecto/target/Proyecto_java_jweb_banco_de_preguntas-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+    COPY httpd.conf /usr/local/apache2/conf/httpd.conf
