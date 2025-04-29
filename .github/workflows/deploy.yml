@@ -73,9 +73,13 @@ jobs:
         run: |
           scp -i deploy_key.pem -r -o StrictHostKeyChecking=no archivos-conf-script ec2-user@${{ needs.despliegue.outputs.instance_public_ip }}:/home/ec2-user/archivos-conf-script
 
-      - name: Subir carpeta con certificados
-        run: |
-          scp -i deploy_key.pem -r -o StrictHostKeyChecking=no certificado ec2-user@${{ needs.despliegue.outputs.instance_public_ip }}:/home/ec2-user/certificado
+      #- name: Subir carpeta con certificados
+      #  run: |
+      #    scp -i deploy_key.pem -r -o StrictHostKeyChecking=no cert-bego ec2-user@${{ needs.despliegue.outputs.instance_public_ip }}:/home/ec2-user/cert-bego
+
+      #- name: Subir carpeta con certificados
+      #  run: |
+      #    scp -i deploy_key.pem -r -o StrictHostKeyChecking=no cert-bego1 ec2-user@${{ needs.despliegue.outputs.instance_public_ip }}:/home/ec2-user/cert-bego1
 
       - name: Ejecutar script como root en EC2
         run: |
