@@ -8,8 +8,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./otra-conf.conf:/usr/local/apache2/conf/httpd.conf  
-      - ./httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf  
     networks:
       - app-network
     depends_on:
